@@ -75,4 +75,30 @@ public class ImageController {
                     .body(null);
         }
     }
+
+    // DELETE: Remove an image
+    @DeleteMapping("/{fileName}")
+    public ResponseEntity<String> deleteImage(@PathVariable String fileName) {
+        try {
+            // Resolve the file path
+            Path filePath = Paths.get(IMAGE_DIR).resolve(fileName);
+            File imgFile = filePath.toFile();
+
+            if (!imgFile.exists()) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                        .body("Image not found.");
+            }
+
+            // Delete the file
+            if (imgFile.delete()) {
+                return ResponseEntity.ok("Image deleted successfully.");
+            } else {
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                        .body("Failed to delete the image.");
+            }
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Error occurred while deleting image: " + e.getMessage());
+        }
+    }
 }
